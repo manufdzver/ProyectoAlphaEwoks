@@ -1,4 +1,0 @@
-package Servidor
-
-class ServidorMulticast {
-}
