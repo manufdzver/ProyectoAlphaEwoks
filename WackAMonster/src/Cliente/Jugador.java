@@ -1,6 +1,8 @@
 package Cliente;
 
-public class Jugador {
+import java.io.Serializable;
+
+public class Jugador implements Serializable {
 
     private String nombre;
     private int puntaje;
