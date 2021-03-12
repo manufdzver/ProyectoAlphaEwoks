@@ -1,6 +1,7 @@
 package Cliente;
 
 import Interfaces.Information;
+import Interfaces.Jugador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

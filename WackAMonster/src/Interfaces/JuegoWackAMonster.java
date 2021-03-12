@@ -1,18 +1,28 @@
-package Servidor;
+package Interfaces;
 
-import Cliente.Jugador;
+import Interfaces.Jugador;
 
 import java.util.Hashtable;
 
 public class JuegoWackAMonster {
     private int numeroDeJuego;
-    private String ganador;
+    private int ronda;
+    private Jugador ganador;
     private Hashtable<String, Jugador> jugadores;
 
     public JuegoWackAMonster() {
         this.numeroDeJuego = 0;
         this.ganador = null;
         this.jugadores = new Hashtable<String, Jugador>();
+        this.ronda = 0;
+    }
+
+    public int getRonda() {
+        return ronda;
+    }
+
+    public void setRonda(int ronda) {
+        this.ronda = ronda;
     }
 
     public int getNumeroDeJuego() {
@@ -23,11 +33,11 @@ public class JuegoWackAMonster {
         this.numeroDeJuego = numeroDeJuego;
     }
 
-    public synchronized String getGanador() {
+    public synchronized Jugador getGanador() {
         return ganador;
     }
 
-    public synchronized void setGanador(String ganador) {
+    public synchronized void setGanador(Jugador ganador) {
         this.ganador = ganador;
     }
 
