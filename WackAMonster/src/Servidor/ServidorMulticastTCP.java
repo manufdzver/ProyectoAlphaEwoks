@@ -122,7 +122,6 @@ class Connection extends Thread {
             }
             out.writeObject(unJugador);
 
-
         } catch (EOFException e) {
             System.out.println("EOF:" + e.getMessage());
         } catch (IOException e) {
