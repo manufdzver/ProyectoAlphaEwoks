@@ -4,6 +4,7 @@ public class Jugador {
 
     private String nombre;
     private int puntaje;
+    private int juego;
 
     public Jugador(String nombre) {
         this.nombre = nombre;
