@@ -14,22 +14,13 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class ClienteJugador {
+public class ClienteJugador extends Thread{
 
-    public static void main(String[] args) {
+    public void run() {
 
         //Crea el hilo del jugador
         JugadorThread jugador = new JugadorThread();
         jugador.start();
-        //JugadorThread jugador2 = new JugadorThread();
-        //jugador2.start();
-            /*TODO,
-               1. Revisar como jugar con más de un jugador en la misma compu
-               2. Respuesta del cliente (envia la clase jugador para que el servidor pueda sumarle el punto)
-               3. Servidor recibe respuestas y asigna puntos (synchronized)
-               4. While en servidor hasta n puntos.
-               5. Estresador
-             */
     }
 }
 
