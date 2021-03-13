@@ -1,21 +1,18 @@
 package Interfaces;
 
 public class Monstruo {
-    private int posicion;
-    private Jugador ganador;
+    private Jugador unJugador;
     private int numeroDeJuego;
     private int ronda;
 
-    public Monstruo(int posicion, int numeroDeJuego, int ronda) {
-        this.posicion = posicion;
-        this.ganador = null;
+    public Monstruo(int numeroDeJuego, int ronda, Jugador unJugador) {
+        this.unJugador = null;
         this.numeroDeJuego = numeroDeJuego;
         this.ronda = ronda;
     }
 
     public Monstruo(){
-        this.posicion = 0;
-        this.ganador = null;
+        this.unJugador = null;
         this.numeroDeJuego = 0;
         this.ronda = 0;
     }
@@ -36,24 +33,12 @@ public class Monstruo {
         this.ronda = ronda;
     }
 
-    public int getPosicion() {
-        return posicion;
+    public Jugador getUnJugador() {
+        return unJugador;
     }
 
-    public void setPosicion(int posicion) {
-        this.posicion = posicion;
-    }
-
-    public Jugador getGanador() {
-        return ganador;
-    }
-
-    public void setGanador(Jugador ganador) {
-        this.ganador = ganador;
-    }
-
-    public void resetGanador(Jugador ganador) {
-        this.ganador = null;
+    public void setUnJugador(Jugador ganador) {
+        this.unJugador = ganador;
     }
 
 }

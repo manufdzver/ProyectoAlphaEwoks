@@ -53,7 +53,7 @@ class SenderMoles extends Thread {
             s = new MulticastSocket(port);
             s.joinGroup(group);
             while (true) {
-                String monstruo = "" + (int) (Math.random() * 9 + 1);
+                String monstruo = "" + (int) (Math.random() * 9 + 1)+","+elJuego.getNumeroDeJuego()+","+elJuego.getRonda();
                 byte[] m = monstruo.getBytes(); //Encapsula el tiempo en un mensaje
                 DatagramPacket messageOut = new DatagramPacket(m, m.length, group, 6789); //Es datagrama porque es UDP
                 s.send(messageOut); //Envia el tiempo a los clientes en el grupo
