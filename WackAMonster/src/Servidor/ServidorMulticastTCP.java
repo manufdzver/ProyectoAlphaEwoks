@@ -6,6 +6,7 @@ import Interfaces.Monstruo;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 
 public class ServidorMulticastTCP {
 
@@ -53,12 +54,19 @@ class SenderMoles extends Thread {
             s = new MulticastSocket(port);
             s.joinGroup(group);
             while (true) {
-                String monstruo = "" + (int) (Math.random() * 9 + 1)+","+elJuego.getNumeroDeJuego()+","+elJuego.getRonda();
+                String monstruo;
+                if(elJuego.getGanador()!=null){
+                    monstruo = "" + 10 +","+elJuego.getGanador()+", Ganador";
+                }
+                else{
+                    monstruo = "" + (int) (Math.random() * 9 + 1)+","+elJuego.getNumeroDeJuego()+","+elJuego.getRonda();
+                }
                 byte[] m = monstruo.getBytes(); //Encapsula el tiempo en un mensaje
                 DatagramPacket messageOut = new DatagramPacket(m, m.length, group, 6789); //Es datagrama porque es UDP
                 s.send(messageOut); //Envia el tiempo a los clientes en el grupo
                 System.out.println("Heartbeat");
                 Thread.sleep(2000);
+
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -82,6 +90,7 @@ class SenderMoles extends Thread {
 
 class Connection extends Thread {
     private JuegoWackAMonster elJuego;
+    private HashMap<Jugador, Integer> puntajes = new HashMap<Jugador, Integer>();
     ObjectInputStream in;
     ObjectOutputStream out;
     Socket clientSocket;
@@ -107,17 +116,22 @@ class Connection extends Thread {
         try {
             numeroDeJuego = elJuego.getNumeroDeJuego();
             ronda = elJuego.getRonda();
-            Jugador unJugador = (Jugador)in.readObject();
+            Monstruo unMonstruo = (Monstruo)in.readObject();
+            Jugador unJugador = unMonstruo.getUnJugador();
             if(unJugador.getNumeroDeJuego()==numeroDeJuego && unJugador.getRonda()==ronda){
                 ronda = ronda+1;
                 elJuego.setRonda(ronda);
-                int puntaje = unJugador.getPuntaje()+1;
-                unJugador.setPuntaje(puntaje);
-
-                if(unJugador.getPuntaje() ==3){
+                if(!puntajes.containsKey(elJuego)){
+                    puntajes.put(unJugador,0);
+                }
+                int puntos=puntajes.get(unJugador);
+                puntos = puntos+1;
+                puntajes.remove(unJugador);
+                puntajes.put(unJugador,puntos);
+                if(puntos>=3){
                     elJuego.setGanador(unJugador);
-                    numeroDeJuego = numeroDeJuego+1;
-                    elJuego.setNumeroDeJuego(numeroDeJuego);
+                    elJuego.setNumeroDeJuego(elJuego.getNumeroDeJuego()+1);
+                    puntajes.clear();
                 }
             }
             out.writeObject(unJugador);
