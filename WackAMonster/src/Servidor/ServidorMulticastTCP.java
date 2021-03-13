@@ -12,6 +12,7 @@ public class ServidorMulticastTCP {
 
     private static JuegoWackAMonster elJuego= new JuegoWackAMonster();
     private static Monstruo elMonstruo = new Monstruo();
+    private static HashMap<Jugador, Integer> puntajes = new HashMap<Jugador, Integer>();
 
     public static void main(String[] args) {
 
@@ -24,7 +25,7 @@ public class ServidorMulticastTCP {
             while (true) {
                 System.out.println("Waiting for connections...");
                 Socket clientSocket = listenSocket.accept();  // Listens for a connection to be made to this socket and accepts it. The method blocks until a connection is made.
-                Connection c = new Connection(clientSocket, elJuego);
+                Connection c = new Connection(clientSocket, elJuego, puntajes);
                 c.start();
             }
         } catch (IOException e) {
@@ -56,7 +57,8 @@ class SenderMoles extends Thread {
             while (true) {
                 String monstruo;
                 if(elJuego.getGanador()!=null){
-                    monstruo = "" + 10 +","+elJuego.getGanador()+", Ganador";
+                    monstruo = "" + 10 +","+elJuego.getGanador().getNombre()+", es el ganador";
+                    elJuego.setGanador(null);
                 }
                 else{
                     monstruo = "" + (int) (Math.random() * 9 + 1)+","+elJuego.getNumeroDeJuego()+","+elJuego.getRonda();
@@ -90,17 +92,14 @@ class SenderMoles extends Thread {
 
 class Connection extends Thread {
     private JuegoWackAMonster elJuego;
-    private HashMap<Jugador, Integer> puntajes = new HashMap<Jugador, Integer>();
+    private HashMap<Jugador, Integer> puntajes;
     ObjectInputStream in;
     ObjectOutputStream out;
     Socket clientSocket;
-    int numeroDeJuego;
-    int ronda;
 
-    public Connection(Socket aClientSocket, JuegoWackAMonster unJuego) {
+    public Connection(Socket aClientSocket, JuegoWackAMonster unJuego, HashMap losPuntajes) {
         this.elJuego = unJuego;
-        this.numeroDeJuego = 0;
-        this.ronda = 0;
+        this.puntajes = losPuntajes;
         try {
             clientSocket = aClientSocket;
             in = new ObjectInputStream(clientSocket.getInputStream());
@@ -113,28 +112,30 @@ class Connection extends Thread {
 
     @Override
     public void run() {
+        int puntos=0;
         try {
-            numeroDeJuego = elJuego.getNumeroDeJuego();
-            ronda = elJuego.getRonda();
             Monstruo unMonstruo = (Monstruo)in.readObject();
             Jugador unJugador = unMonstruo.getUnJugador();
-            if(unJugador.getNumeroDeJuego()==numeroDeJuego && unJugador.getRonda()==ronda){
-                ronda = ronda+1;
-                elJuego.setRonda(ronda);
+
+            if(unJugador.getNumeroDeJuego()== elJuego.getNumeroDeJuego() && unJugador.getRonda()== elJuego.getRonda()){
+                elJuego.setRonda(elJuego.getRonda()+1);
                 if(!puntajes.containsKey(elJuego)){
                     puntajes.put(unJugador,0);
                 }
-                int puntos=puntajes.get(unJugador);
+                puntos=puntajes.get(unJugador);
                 puntos = puntos+1;
-                puntajes.remove(unJugador);
-                puntajes.put(unJugador,puntos);
+
                 if(puntos>=3){
                     elJuego.setGanador(unJugador);
                     elJuego.setNumeroDeJuego(elJuego.getNumeroDeJuego()+1);
                     puntajes.clear();
                 }
+                else{
+                    puntajes.remove(unJugador);
+                    puntajes.put(unJugador,puntos);
+                }
             }
-            out.writeObject(unJugador);
+            //out.writeObject(unJugador);
 
         } catch (EOFException e) {
             System.out.println("EOF:" + e.getMessage());

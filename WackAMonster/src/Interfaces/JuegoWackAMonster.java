@@ -17,27 +17,27 @@ public class JuegoWackAMonster {
         this.ronda = 0;
     }
 
-    public int getRonda() {
+    public synchronized int getRonda() {
         return ronda;
     }
 
-    public void setRonda(int ronda) {
+    public synchronized void setRonda(int ronda) {
         this.ronda = ronda;
     }
 
-    public int getNumeroDeJuego() {
+    public synchronized int getNumeroDeJuego() {
         return numeroDeJuego;
     }
 
-    public void setNumeroDeJuego(int numeroDeJuego) {
+    public synchronized void setNumeroDeJuego(int numeroDeJuego) {
         this.numeroDeJuego = numeroDeJuego;
     }
 
-    public synchronized Jugador getGanador() {
+    public Jugador getGanador() {
         return ganador;
     }
 
-    public synchronized void setGanador(Jugador ganador) {
+    public void setGanador(Jugador ganador) {
         this.ganador = ganador;
     }
 
