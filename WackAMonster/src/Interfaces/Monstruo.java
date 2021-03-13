@@ -1,6 +1,8 @@
 package Interfaces;
 
-public class Monstruo {
+import java.io.Serializable;
+
+public class Monstruo implements Serializable {
     private Jugador unJugador;
     private int numeroDeJuego;
     private int ronda;
