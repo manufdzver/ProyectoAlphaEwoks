@@ -54,7 +54,7 @@ public class MonsterListener extends Thread{
                     monstruo.setRonda(ronda);
                     monstruo.setNumeroDeJuego(juego);
                     monstruo.setUnJugador(jugador);
-                    //sendGolpe(monstruo);
+                    sendGolpe(monstruo);
                 }
 
             }
@@ -83,6 +83,7 @@ public class MonsterListener extends Thread{
 
                 //System.out.println("Monstruo recibido en la posicion: " + newMonster + " from: " + messageIn.getAddress());
                 setMonster(monsterArr[0]);
+
             }
 
             //s.leaveGroup(group);
@@ -115,8 +116,8 @@ public class MonsterListener extends Thread{
             //s = new Socket("127.0.0.1", serverPort);
 
             //Recibe los "caminos" de la conexion que encontro con el servidor
-            ObjectInputStream in = new ObjectInputStream(s.getInputStream());
             ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(s.getInputStream());
 
             out.writeObject(mons);
             System.out.println("Message sent");
