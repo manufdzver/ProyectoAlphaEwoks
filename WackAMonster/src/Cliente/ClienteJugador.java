@@ -2,10 +2,13 @@ package Cliente;
 
 import Interfaces.Information;
 import Interfaces.Jugador;
+import Interfaces.Monstruo;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -18,8 +21,8 @@ public class ClienteJugador {
         //Crea el hilo del jugador
         JugadorThread jugador = new JugadorThread();
         jugador.start();
-        JugadorThread jugador2 = new JugadorThread();
-        jugador2.start();
+        //JugadorThread jugador2 = new JugadorThread();
+        //jugador2.start();
             /*TODO,
                1. Revisar como jugar con más de un jugador en la misma compu
                2. Respuesta del cliente (envia la clase jugador para que el servidor pueda sumarle el punto)
@@ -42,8 +45,8 @@ class JugadorThread extends Thread{
     private Jugador jugador;
 
     public void getInformation(){
-        System.setProperty("java.security.policy", "C:\\Users\\manuf\\OneDrive\\Escritorio\\ProyectoAlphaEwoks\\WackAMonster\\src\\Cliente\\client.policy");
-        //System.setProperty("java.security.policy", "/Users/santiagoborobia/Documents/ITAM/Semestre_10/Sistemas_Distribuidos/ProyectoAlphaEwoks/WackAMonster/src/Servidor/server.policy");
+        //System.setProperty("java.security.policy", "C:\\Users\\manuf\\OneDrive\\Escritorio\\ProyectoAlphaEwoks\\WackAMonster\\src\\Cliente\\client.policy");
+        System.setProperty("java.security.policy", "/Users/santiagoborobia/Documents/ITAM/Semestre_10/Sistemas_Distribuidos/ProyectoAlphaEwoks/WackAMonster/src/Servidor/server.policy");
 
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
@@ -93,7 +96,7 @@ class JugadorThread extends Thread{
         registrar.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 jugador = new Jugador(inputNombre.getText());
-                getInformation();
+                getInformation(); // a traves de RMI
                 frame.dispose();
                 tablero();
             }
@@ -117,7 +120,7 @@ class JugadorThread extends Thread{
 
         lblJugador.setText("Jugador: " + jugador.getNombre());
         lblJugador.setBounds(125, 10, 300, 20);
-        lblPuntaje.setText("Puntaje: " + jugador.getPuntaje());
+        lblPuntaje.setText("Puntaje: " );
         lblPuntaje.setBounds(125, 30, 200, 20);
         title.setText("¡Golpea al monstruo cuando aparezca!");
         title.setBounds(125, 80, 250, 20);
@@ -127,9 +130,11 @@ class JugadorThread extends Thread{
 
         //Crea la ubicacion de los monstruos
         JCheckBox monsters[] = new JCheckBox[9];
+
         for(int i=0; i<9; i++){
             monsters[i] = new JCheckBox("M"+(i+1));
         }
+
         //Fija la posicion de los hoyos de los monstruos
         monsters[0].setBounds(120,100, 70,50);
         monsters[1].setBounds(120,150, 70,50);
@@ -149,7 +154,7 @@ class JugadorThread extends Thread{
         frame.setLayout(null);
         frame.setVisible(true);
 
-        MonsterListener multicastListener = new MonsterListener(monsters, ipMulticast, multicastSocket);
+        MonsterListener multicastListener = new MonsterListener(monsters, ipMulticast, multicastSocket, jugador, ip, tcpSocket);
         multicastListener.start();
     }
 
