@@ -54,13 +54,17 @@ class SenderMoles extends Thread {
             group = InetAddress.getByName(address);
             s = new MulticastSocket(port);
             s.joinGroup(group);
+            String monstruo = null;
             while (true) {
-                String monstruo;
-                if(elJuego.getGanador()!=null){
-                    monstruo = "" + 10 +","+elJuego.getGanador().getNombre()+", es el ganador";
+                monstruo = null;
+                if(elJuego.getGanador()!= null){
+                    monstruo = "";
+                    monstruo = "" + 10 +","+elJuego.getGanador().getNombre() + ", ";
                     elJuego.setGanador(null);
+
                 }
                 else{
+                    monstruo = "";
                     monstruo = "" + (int) (Math.random() * 9 + 1)+","+elJuego.getNumeroDeJuego()+","+elJuego.getRonda();
                 }
                 byte[] m = monstruo.getBytes(); //Encapsula el tiempo en un mensaje
@@ -127,8 +131,9 @@ class Connection extends Thread {
                 puntos = puntos+1;
 
                 if(puntos>=3){
-                    //elJuego.setGanador(unJugador);
+                    elJuego.setGanador(unJugador);
                     elJuego.setNumeroDeJuego(elJuego.getNumeroDeJuego()+1);
+                    elJuego.setRonda(0);
                     puntajes.clear();
                     System.out.println("Ganador:" + unJugador.getNombre());
                 }
@@ -137,7 +142,7 @@ class Connection extends Thread {
                     puntajes.put(unJugador,puntos);
                 }
             }
-            //out.writeObject(unJugador);
+
 
         } catch (EOFException e) {
             System.out.println("EOF:" + e.getMessage());

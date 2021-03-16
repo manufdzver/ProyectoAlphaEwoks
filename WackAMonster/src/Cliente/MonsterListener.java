@@ -17,13 +17,14 @@ public class MonsterListener extends Thread{
     private int selectedPos = -1;
     private Monstruo monstruo;
     private Jugador jugador;
+    private JLabel ganador;
 
     private String ipMulticast;
     private int multicastSocket;
     private String ipTCP;
     private int socketTCP;
 
-    public MonsterListener(JCheckBox pos[], String ip, int socket, Jugador jug, String ipTCP, int socketTCP ){
+    public MonsterListener(JCheckBox pos[], String ip, int socket, Jugador jug, String ipTCP, int socketTCP, JLabel ganador ){
         this.monsters = pos;
         this.ipMulticast = ip;
         this.multicastSocket = socket;
@@ -31,6 +32,7 @@ public class MonsterListener extends Thread{
         this.ipTCP = ipTCP;
         this.socketTCP = socketTCP;
         this.monstruo = new Monstruo();
+        this.ganador = ganador;
     }
 
     @Override
@@ -79,10 +81,18 @@ public class MonsterListener extends Thread{
                 //Recibe mosntruo en el formato: "posicion,numeroJuego,numeroRonda"
                 String newMonster = new String(messageIn.getData());
                 monsterArr = newMonster.split(",");
-                //System.out.println("posicion: "+monsterArr[0]+ " numJuego: "+monsterArr[1]+" numRonda: "+monsterArr[2]);
 
-                //System.out.println("Monstruo recibido en la posicion: " + newMonster + " from: " + messageIn.getAddress());
-                setMonster(monsterArr[0]);
+                if(monsterArr[0].equals("10")) {
+                    monsters[selectedPos-1].setSelected(false);
+                    ganador.setText("El ganador es: " + monsterArr[1]);
+                    Thread.sleep(2000);
+                    ganador.setText("Iniciando nuevo juego...");
+                    Thread.sleep(2000);
+                    ganador.setText("");
+                }
+                else {
+                    setMonster(monsterArr[0]);
+                }
 
             }
 
@@ -91,6 +101,8 @@ public class MonsterListener extends Thread{
             System.out.println("Socket: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("IO: " + e.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             if (s != null)
                 s.close();

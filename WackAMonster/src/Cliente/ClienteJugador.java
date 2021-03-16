@@ -2,13 +2,10 @@ package Cliente;
 
 import Interfaces.Information;
 import Interfaces.Jugador;
-import Interfaces.Monstruo;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -17,7 +14,6 @@ import java.rmi.registry.Registry;
 public class ClienteJugador extends Thread{
 
     public void run() {
-
         //Crea el hilo del jugador
         JugadorThread jugador = new JugadorThread();
         jugador.start();
@@ -88,7 +84,7 @@ class JugadorThread extends Thread{
             public void actionPerformed(ActionEvent e){
                 jugador = new Jugador(inputNombre.getText());
                 getInformation(); // a traves de RMI
-                frame.dispose();
+                //frame.dispose();
                 tablero();
             }
         });
@@ -101,23 +97,22 @@ class JugadorThread extends Thread{
     public void tablero() {
         //Crea la ventana de juego
         JFrame frame = new JFrame("Wack-a-Monster");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 400);
 
         //Titulo de la ventana de juego
         JLabel title  = new JLabel();
         JLabel lblJugador  = new JLabel();
-        JLabel lblPuntaje  = new JLabel();
+        JLabel lblGanador  = new JLabel();
 
         lblJugador.setText("Jugador: " + jugador.getNombre());
         lblJugador.setBounds(125, 10, 300, 20);
-        lblPuntaje.setText("Puntaje: " );
-        lblPuntaje.setBounds(125, 30, 200, 20);
+        lblGanador.setBounds(125, 30, 200, 20);
         title.setText("¡Golpea al monstruo cuando aparezca!");
         title.setBounds(125, 80, 250, 20);
         frame.add(title);
         frame.add(lblJugador);
-        frame.add(lblPuntaje);
+        frame.add(lblGanador);
 
         //Crea la ubicacion de los monstruos
         JCheckBox monsters[] = new JCheckBox[9];
@@ -145,7 +140,7 @@ class JugadorThread extends Thread{
         frame.setLayout(null);
         frame.setVisible(true);
 
-        MonsterListener multicastListener = new MonsterListener(monsters, ipMulticast, multicastSocket, jugador, ip, tcpSocket);
+        MonsterListener multicastListener = new MonsterListener(monsters, ipMulticast, multicastSocket, jugador, ip, tcpSocket, lblGanador);
         multicastListener.start();
     }
 
