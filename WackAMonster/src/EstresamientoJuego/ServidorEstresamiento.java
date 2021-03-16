@@ -1,14 +1,17 @@
-package Servidor;
+package EstresamientoJuego;
 
 import Interfaces.JuegoWackAMonster;
 import Interfaces.Jugador;
 import Interfaces.Monstruo;
 
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.*;
 import java.util.HashMap;
 
-public class ServidorMulticastTCP {
+public class ServidorEstresamiento {
 
     private static JuegoWackAMonster elJuego= new JuegoWackAMonster();
     private static Monstruo elMonstruo = new Monstruo();
@@ -72,13 +75,12 @@ class SenderMoles extends Thread {
                 s.send(messageOut); //Envia el tiempo a los clientes en el grupo
                 //System.out.println("Heartbeat");
                 Thread.sleep(2000);
-
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             if (s != null) {
@@ -122,12 +124,12 @@ class Connection extends Thread {
             Monstruo unMonstruo = (Monstruo)in.readObject();
             Jugador unJugador = unMonstruo.getUnJugador();
 
-            if(unMonstruo.getNumeroDeJuego()== elJuego.getNumeroDeJuego() && unMonstruo.getRonda()== elJuego.getRonda()){
+            if(unMonstruo.getNumeroDeJuego() == elJuego.getNumeroDeJuego() && unMonstruo.getRonda()== elJuego.getRonda()){
                 elJuego.setRonda(elJuego.getRonda()+1);
                 if(!puntajes.containsKey(unJugador)){
                     puntajes.put(unJugador,0);
                 }
-                puntos=puntajes.get(unJugador);
+                puntos = puntajes.get(unJugador);
                 puntos = puntos+1;
 
                 if(puntos>=3){
@@ -141,9 +143,8 @@ class Connection extends Thread {
                     puntajes.remove(unJugador);
                     puntajes.put(unJugador,puntos);
                 }
-
             }
-
+            out.writeObject(unMonstruo);
 
         } catch (EOFException e) {
             System.out.println("EOF:" + e.getMessage());

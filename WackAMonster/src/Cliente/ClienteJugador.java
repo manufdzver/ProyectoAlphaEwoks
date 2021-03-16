@@ -52,8 +52,6 @@ class JugadorThread extends Thread{
             tcpSocket = info.sendTcpSocket();
             multicastSocket = info.sendMulticastSocket();
 
-            System.out.println("Recibi todo" + ipMulticast);
-
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (NotBoundException e) {
