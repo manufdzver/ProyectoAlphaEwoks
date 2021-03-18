@@ -26,8 +26,7 @@ public class ServidorEstresamiento {
             int serverPort = 7896;
             ServerSocket listenSocket = new ServerSocket(serverPort);
             while (true) {
-                //System.out.println("Waiting for connections...");
-                Socket clientSocket = listenSocket.accept();  // Listens for a connection to be made to this socket and accepts it. The method blocks until a connection is made.
+                Socket clientSocket = listenSocket.accept();
                 Connection c = new Connection(clientSocket, elJuego, puntajes);
                 c.start();
             }
@@ -68,12 +67,12 @@ class SenderMoles extends Thread {
                 }
                 else{
                     monstruo = "";
-                    monstruo = "" + (int) (Math.random() * 9 + 1)+","+elJuego.getNumeroDeJuego()+","+elJuego.getRonda();
+                    monstruo = "" + (int) (Math.random() * 9 + 1)+","+elJuego.getNumeroDeJuego()+","+elJuego.getRonda()+","+System.currentTimeMillis();
                 }
-                byte[] m = monstruo.getBytes(); //Encapsula el tiempo en un mensaje
-                DatagramPacket messageOut = new DatagramPacket(m, m.length, group, 6789); //Es datagrama porque es UDP
-                s.send(messageOut); //Envia el tiempo a los clientes en el grupo
-                //System.out.println("Heartbeat");
+                byte[] m = monstruo.getBytes();
+                DatagramPacket messageOut = new DatagramPacket(m, m.length, group, 6789);
+                long salida = System.currentTimeMillis();
+                s.send(messageOut);
                 Thread.sleep(2000);
             }
         } catch (UnknownHostException e) {
@@ -85,7 +84,7 @@ class SenderMoles extends Thread {
         } finally {
             if (s != null) {
                 try {
-                    s.leaveGroup(group); //Se sale del grupo y deja de escuchar el socket (Hay que salirse antes de cerrar el socket)
+                    s.leaveGroup(group);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -121,7 +120,7 @@ class Connection extends Thread {
         int puntos = 0;
 
         try {
-            Monstruo unMonstruo = (Monstruo)in.readObject();
+            MonstruoEstresador unMonstruo = (MonstruoEstresador) in.readObject();
             Jugador unJugador = unMonstruo.getUnJugador();
 
             if(unMonstruo.getNumeroDeJuego() == elJuego.getNumeroDeJuego() && unMonstruo.getRonda()== elJuego.getRonda()){
@@ -144,7 +143,9 @@ class Connection extends Thread {
                     puntajes.put(unJugador,puntos);
                 }
             }
-            out.writeObject(unMonstruo);
+            long totalTime = (System.currentTimeMillis()-unMonstruo.getTiempoNacimiento());
+
+            System.out.println(unJugador.getNombre()+",TiempoRonda," + totalTime);
 
         } catch (EOFException e) {
             System.out.println("EOF:" + e.getMessage());

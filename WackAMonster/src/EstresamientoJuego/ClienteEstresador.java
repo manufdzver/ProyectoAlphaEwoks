@@ -1,11 +1,7 @@
 package EstresamientoJuego;
 
 import Interfaces.Jugador;
-import Interfaces.Monstruo;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,7 +13,7 @@ public class ClienteEstresador extends Thread{
 
     private Jugador jugador;
     private String[] monsterArr;
-    private Monstruo monstruo;
+    private MonstruoEstresador monstruo;
     private int rondas;
     private int nClients;
 
@@ -25,13 +21,13 @@ public class ClienteEstresador extends Thread{
         this.jugador = new Jugador(nom);
         this.rondas = rondas;
         this.nClients = cltes;
-        this.monstruo = new Monstruo();
+        this.monstruo = new MonstruoEstresador();
     }
 
     @Override
     public void run() {
 
-        long startTime, spentTime;
+        long receptionTime, spentTime;
         long times[] = new long[1000];
         double avgTime = 0;
 
@@ -46,8 +42,9 @@ public class ClienteEstresador extends Thread{
             int i = 0;
 
             while(i < rondas) {
-                startTime = System.currentTimeMillis();
+
                 s.receive(messageIn);//Es bloqueante
+                receptionTime = System.currentTimeMillis();
                 String newMonster = new String(messageIn.getData());
                 monsterArr = newMonster.split(",");
 
@@ -57,26 +54,27 @@ public class ClienteEstresador extends Thread{
                 else {
                     int ronda = Integer.parseInt(monsterArr[2].trim());
                     int juego = Integer.parseInt(monsterArr[1].trim());
+                    spentTime = receptionTime - Long.parseLong(monsterArr[3].trim());
+                    System.out.println(jugador.getNombre()+",TiempoRecepcion,"+ spentTime);
                     monstruo.setRonda(ronda);
                     monstruo.setNumeroDeJuego(juego);
                     monstruo.setUnJugador(jugador);
+                    monstruo.setTiempoRecepcion(spentTime);
+                    monstruo.setTiempoNacimiento(receptionTime);
                     sendGolpe(monstruo);
                 }
-                spentTime = System.currentTimeMillis() - startTime; //Registra tiempo de consulta
-                times[i] = spentTime;
-                avgTime = avgTime + spentTime;
+                //spentTime = System.currentTimeMillis() - startTime; //Registra tiempo de consulta
+                //times[i] = spentTime;
+                //avgTime = avgTime + spentTime;
 
                 i++;
             }
-            avgTime = avgTime/rondas;
-            double stdDev = stdDev(times);
-            System.out.println("Cltes,"+nClients+",Sols,"+rondas+",Avg. resp time (ms),"+avgTime+",std. Dev,"+stdDev);
             s.leaveGroup(group);
 
         } catch (SocketException e) {
-            System.out.println("Socket: " + e.getMessage());
+            //System.out.println("Socket: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("IO: " + e.getMessage());
+            //System.out.println("IO: " + e.getMessage());
         } finally {
             if (s != null)
 
@@ -85,7 +83,7 @@ public class ClienteEstresador extends Thread{
     }
 
 
-    public void sendGolpe(Monstruo mons){
+    public void sendGolpe(MonstruoEstresador mons){
 
 
         Socket s = null;
@@ -93,12 +91,11 @@ public class ClienteEstresador extends Thread{
             int serverPort = 7896;
             s = new Socket("localhost", serverPort);
 
-            //Recibe los "caminos" de la conexion que encontro con el servidor
             ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(s.getInputStream());
 
             out.writeObject(mons);
-            Monstruo respuesta = (Monstruo) in.readObject();
+            //MonstruoEstresador respuesta = (MonstruoEstresador) in.readObject();
 
         }
         catch (UnknownHostException e) {
@@ -109,8 +106,6 @@ public class ClienteEstresador extends Thread{
         }
         catch (IOException e) {
             System.out.println("IO:"+e.getMessage());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } finally {
             if(s!=null)
                 try {
